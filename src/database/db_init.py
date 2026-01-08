@@ -37,6 +37,7 @@ def init_db():
             username TEXT PRIMARY KEY,
             email TEXT,
             status TEXT DEFAULT 'PENDING',
+            temp_password TEXT,
             request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -73,7 +74,7 @@ def init_db():
     if not admin_exist:
         print("Création du compte administrateur par défaut...")
         # Mot de passe par défaut : admin123
-        hashed_pass = stauth.Hasher(['admin123']).generate()[0]
+        hashed_pass = stauth.Hasher().hash('admin123')
         
         c.execute('''
             INSERT INTO users (username, name, email, password_hash, role, must_change_password)
