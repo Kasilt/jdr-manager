@@ -8,6 +8,10 @@ from ui.lab import show_lab
 if "show_access_request" not in st.session_state:
     st.session_state["show_access_request"] = False
 
+# Initialize session state for admin panel
+if "show_admin_panel" not in st.session_state:
+    st.session_state["show_admin_panel"] = False
+
 # Show access request page if user clicked on it
 if st.session_state["show_access_request"]:
     show_access_request_page()

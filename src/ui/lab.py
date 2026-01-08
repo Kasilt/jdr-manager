@@ -36,8 +36,6 @@ def get_user_role(username: str) -> str:
 def show_lab():
     """Display the JDR component laboratory with UI examples."""
     
-    st.title("🧙‍♂️ Laboratoire de Composants JDR")
-    
     # Get current user info
     username = st.session_state.get("username")
     user_role = get_user_role(username) if username else "unknown"
@@ -46,18 +44,34 @@ def show_lab():
     with st.sidebar:
         st.header("Fiche technique")
         st.caption(f"👤 {username} ({user_role})")
+        
+        # Admin button in sidebar if user is admin
+        if user_role == "admin":
+            if st.button("👑 Administration", use_container_width=True, type="primary"):
+                st.session_state["show_admin_panel"] = True
+        
+        # Back button if admin panel is open
+        if st.session_state.get("show_admin_panel", False) and user_role == "admin":
+            if st.button("← Retour au Laboratoire", use_container_width=True):
+                st.session_state["show_admin_panel"] = False
+                st.rerun()
+        
         mode_mj = st.toggle("Mode Maître du Jeu")  # Un interrupteur moderne
 
-    # 2. Check if user is admin
-    if user_role == "admin":
-        tab1, tab2, tab_admin = st.tabs(["🎒 Inventaire", "📜 Sorts / Compétences", "👑 Administration"])
-        
-        with tab_admin:
-            show_admin_requests_panel()
-    else:
-        tab1, tab2 = st.tabs(["🎒 Inventaire", "📜 Sorts / Compétences"])
+    # Show admin panel if requested
+    if st.session_state.get("show_admin_panel", False) and user_role == "admin":
+        st.title("👑 Administration - Gestion des Demandes d'Accès")
+        st.divider()
+        show_admin_requests_panel()
+        return
 
-    # 2. Les Colonnes (Pour ne pas avoir une liste verticale infinie)
+    # Show main lab
+    st.title("🧙‍♂️ Laboratoire de Composants JDR")
+
+    # 2. User tabs
+    tab1, tab2 = st.tabs(["🎒 Inventaire", "📜 Sorts / Compétences"])
+
+    # 3. Les Colonnes (Pour ne pas avoir une liste verticale infinie)
     col1, col2 = st.columns(2)
 
     with col1:
@@ -75,7 +89,7 @@ def show_lab():
 
     st.divider()  # Une ligne de séparation horizontale
 
-    # 3. Les Onglets (Tabs) - Pour organiser l'inventaire et les sorts
+    # 4. Les Onglets (Tabs) - Pour organiser l'inventaire et les sorts
     with tab1:
         # Sélection multiple
         items = st.multiselect("Équipement", ["Épée longue", "Arc", "Ration", "Torche"])
@@ -89,6 +103,6 @@ def show_lab():
 
     st.divider()
 
-    # 4. Action
+    # 5. Action
     if st.button("🎲 Faire un test de Force", type="primary"):
         st.success(f"{nom} utilise sa Force de {force} et a toujours {pv} points de vie !")
